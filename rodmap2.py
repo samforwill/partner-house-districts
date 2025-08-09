@@ -32,7 +32,7 @@ df_metrics = load_metrics()
 geojson_data = load_geojson()
 
 # -----------------------------
-# Sidebar: filters + options
+# Sidebar: filters only
 # -----------------------------
 with st.sidebar:
     st.header("Filters")
@@ -53,9 +53,6 @@ with st.sidebar:
         selected_turfs = st.multiselect("Select Turf(s):", available_turfs, default=[])
     else:
         selected_turfs = []
-
-    st.markdown("---")
-    show_labels = st.checkbox("Show precinct labels on map", value=False)
 
 # -----------------------------
 # Filter for view
@@ -145,19 +142,6 @@ if len(filtered_metrics) > 0:
                 localize=True,
             ) if len(filtered_features) < 1000 else None,
         ).add_to(m)
-
-if show_labels and len(filtered_features) > 0:
-    for feature in filtered_features:
-        props = feature["properties"]
-        lat, lon = props.get("centroid_lat"), props.get("centroid_lon")
-        name = props.get("van_precinct_name", "Unnamed")
-        if lat is not None and lon is not None:
-            folium.Marker(
-                location=[lat, lon],
-                icon=folium.DivIcon(
-                    html=f"""<div style="font-size:10px; color:black; text-align:center;">{name}</div>"""
-                ),
-            ).add_to(m)
 
 st_folium(m, key="map", width=None, height=600, returned_objects=[])
 
