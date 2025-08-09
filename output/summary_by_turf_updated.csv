@@ -17,10 +17,9 @@ R02 - Fairfax,R02F - Herndon,50266,34259,14
 R02 - Fairfax,R02G - McLean,56987,39032,18
 R02 - Fairfax,R02H - Reston,64402,40879,19
 R02 - Fairfax,R02I - Vienna,63363,42252,23
-R02 - Fairfax,R03C - HD 30,1460,532,1
 R03 - Loudoun,R03A - Ashburn,53648,29962,17
 R03 - Loudoun,R03B - HD 21,59131,30721,17
-R03 - Loudoun,R03C - HD 30,69112,28647,27
+R03 - Loudoun,R03C - HD 30,70572,29179,28
 R03 - Loudoun,R03D - Leesburg,67239,36226,24
 R03 - Loudoun,R03E - Manassas,47078,28264,14
 R03 - Loudoun,R03F - Misc,55030,17361,26
@@ -36,11 +35,11 @@ R04 - Prince William,R04G - Spring Hill,53910,36847,16
 R04 - Prince William,R04H - West Springfield,82193,52297,27
 R04 - Prince William,R04I - Woodbridge,59696,39960,18
 R04 - Prince William,R05B - HD 65,6686,3335,2
-R05 - Fredericksburg,R05A - East,91541,26726,49
+R05 - Fredericksburg,R05A - East,100765,28438,57
 R05 - Fredericksburg,R05B - HD 65,59918,29518,16
 R05 - Fredericksburg,R05C - HD 66,68719,28440,22
 R05 - Fredericksburg,R05D - SW,80481,27037,27
-R05 - Fredericksburg,R05E - West,99610,33227,46
+R05 - Fredericksburg,R05E - West,108842,35955,54
 R06 - North Richmond,R06A - Downtown,33733,28697,14
 R06 - North Richmond,R06B - HD 57,66192,33660,20
 R06 - North Richmond,R06C - Highland Park,60100,49286,26
@@ -71,7 +70,7 @@ R09 - Suffolk,R09F - South,73769,42657,27
 R10 - Virginia Beach / Norfolk,R10A - Virginia Beach,97365,37855,29
 R10 - Virginia Beach / Norfolk,R10C - HD 97,63504,30211,20
 R10 - Virginia Beach / Norfolk,R10D - Norfolk,58434,41433,20
-R10 - Virginia Beach / Norfolk,R10E - Norfolk Central,73903,53306,19
+R10 - Virginia Beach / Norfolk,R10E - Norfolk Central,115359,80698,27
 R10 - Virginia Beach / Norfolk,R10F - North,35650,14545,21
 R10 - Virginia Beach / Norfolk,R10G - North Norfolk,53340,26173,18
 R10 - Virginia Beach / Norfolk,R10I - South,75062,34829,25
@@ -86,13 +85,13 @@ R12 - Shenandoah,R12B - North Roanoke,113797,35841,56
 R12 - Shenandoah,R12C - South Roanoke,73222,30119,27
 R12 - Shenandoah,R12D - Staunton,123839,29640,69
 R12 - Shenandoah,R12E - Winchester,135318,38642,53
-R13 - Southwest,R13A -  Greater CD9,193160,43507,120
-R13 - Southwest,R13B - Galax,284114,25754,217
+R13 - Southwest,R13A -  Greater CD9,202040,44211,128
+R13 - Southwest,R13B - Galax,301434,28002,241
 R13 - Southwest,R13C - The Hollers,100165,36584,65
 R13 - Southwest,R13D - HD41,56127,22114,27
 R13 - Southwest,R13E - Lynchburg,188575,46690,77
 R14 - Charlottesville,R14A - Central,70160,20200,43
 R14 - Charlottesville,R14B - NE Charlottesville,44963,32549,14
 R14 - Charlottesville,R14C - S Charlottesville,53403,28018,16
-R14 - Charlottesville,R14D - South,72123,20536,43
+R14 - Charlottesville,R14D - South,92747,25056,51
 R14 - Charlottesville,R14E - UV,45696,30110,14
