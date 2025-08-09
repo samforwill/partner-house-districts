@@ -2,7 +2,4 @@ streamlit
 pandas
 folium
 streamlit-folium
-geopandas
-shapely
 plotly
-pydeck

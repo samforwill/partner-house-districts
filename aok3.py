@@ -38,9 +38,14 @@ df_upd  = load_metrics(METRICS_UPD,  Path(METRICS_UPD).stat().st_mtime_ns)
 geo_upd = load_geojson(GEOJSON_UPD,  Path(GEOJSON_UPD).stat().st_mtime_ns)
 
 # -----------------------------
-# QUICK VIEW (above maps) — source of truth is session_state; sidebar only renders widgets
+# QUICK VIEW 
 # -----------------------------
 QUICK_VIEWS = {
+    "": {  # Default empty selection
+        "regions": [],
+        "turfs": [],
+        "desc": ""
+    },
     "R07 changes": {
         "regions": ["R07 - South Richmond", "R11 - Southside", "R06 - North Richmond"],
         "turfs": ["R07F - Placeholder3", "R07D - Placeholder2",
@@ -60,45 +65,39 @@ QUICK_VIEWS = {
     }
 }
 
-# Big, clear heading + purpose
-st.markdown(
-    """
-    <h1 style='text-align:center; color:#2c3e50; font-size:40px; margin-bottom:0;'>Quick Views</h1>
-    <p style='text-align:center; font-size:18px; color:#555; margin-top:4px;'>
-      Jump to filters showing the biggest turf changes
-    </p>
-    """,
-    unsafe_allow_html=True
-)
+# Quick view section with left-aligned layout
+st.markdown("### Quick Views")
+st.markdown("Jump to filters showing the biggest turf changes")
 
-# Selector (blank default), label hidden to avoid clutter under the big title
-qv = st.selectbox(
-    "Quick View",
-    [""] + list(QUICK_VIEWS.keys()),
-    index=0,
-    label_visibility="collapsed"
-)
+# Create columns for better layout control
+col1, col2, col3 = st.columns([2, 3, 3])
 
-# Show description immediately + Apply to set filters
-if qv:
-    st.info(f"**Changes in this view:** {QUICK_VIEWS[qv]['desc']}")
-    c1, c2 = st.columns([1,1])
-    with c1:
-        if st.button("Apply quick view", use_container_width=True):
-            st.session_state["regions_ms"] = QUICK_VIEWS[qv]["regions"]
-            st.session_state["turfs_ms"]   = QUICK_VIEWS[qv]["turfs"]
-            st.experimental_rerun()
-    with c2:
-        if st.button("Clear selection", use_container_width=True):
-            st.session_state.pop("regions_ms", None)
-            st.session_state.pop("turfs_ms", None)
-            st.experimental_rerun()
+with col1:
+    # Selector - auto-applies on change
+    qv = st.selectbox(
+        "Select a view:",
+        list(QUICK_VIEWS.keys()),
+        index=0,
+        key="quick_view_selector"
+    )
+
+# Show description if a view is selected
+if qv and QUICK_VIEWS[qv]["desc"]:
+    with col2:
+        st.info(f"**Changes:** {QUICK_VIEWS[qv]['desc']}")
 
 st.markdown("---")
 
+# Get selected regions and turfs from quick view
+if qv:
+    default_regions = QUICK_VIEWS[qv]["regions"]
+    default_turfs = QUICK_VIEWS[qv]["turfs"]
+else:
+    default_regions = []
+    default_turfs = []
 
 # -----------------------------
-# Sidebar: Filters ONLY (no quick views here)
+# Sidebar: Filters
 # -----------------------------
 with st.sidebar:
     st.header("Filters")
@@ -108,15 +107,17 @@ with st.sidebar:
                      .union(set(df_upd["Current Region"].dropna().unique())))
     regions_with_all = ["VA All Regions"] + regions
 
-    # Regions widget: pass default ONLY if key not set to avoid warnings
-    if "regions_ms" in st.session_state:
-        selected_regions_raw = st.multiselect(
-            "Select Region(s):", regions_with_all, key="regions_ms"
-        )
-    else:
-        selected_regions_raw = st.multiselect(
-            "Select Region(s):", regions_with_all, default=[], key="regions_ms"  # blank by default
-        )
+    # Regions widget with default from quick view
+    selected_regions_raw = st.multiselect(
+        "Select Region(s):", 
+        regions_with_all, 
+        default=default_regions,
+        key="regions_ms"
+    )
+    
+    # Check if manual change occurred (selected regions don't match quick view)
+    if selected_regions_raw != default_regions and qv:
+        st.session_state["quick_view_selector"] = ""
 
     if "VA All Regions" in selected_regions_raw:
         selected_regions = regions
@@ -131,11 +132,19 @@ with st.sidebar:
     else:
         turfs_all = []
 
-    # Turfs widget: same no-default-if-key-present pattern
-    if "turfs_ms" in st.session_state:
-        selected_turfs = st.multiselect("Select Turf(s):", turfs_all, key="turfs_ms")
-    else:
-        selected_turfs = st.multiselect("Select Turf(s):", turfs_all, default=[], key="turfs_ms")
+    # Turfs widget with default from quick view
+    # Only set default turfs if they're in the available turfs
+    available_default_turfs = [t for t in default_turfs if t in turfs_all]
+    selected_turfs = st.multiselect(
+        "Select Turf(s):", 
+        turfs_all, 
+        default=available_default_turfs,
+        key="turfs_ms"
+    )
+    
+    # Check if manual change occurred (selected turfs don't match quick view)
+    if selected_turfs != available_default_turfs and qv:
+        st.session_state["quick_view_selector"] = ""
 
     st.markdown("---")
     show_labels = st.checkbox("Show precinct labels on maps", value=False)
@@ -188,8 +197,6 @@ def turf_colors(df):
 # -----------------------------
 # Two columns: Original vs Updated
 # -----------------------------
-col_left, col_right = st.columns(2, gap="large")
-
 def render_side(title, df_filt, geo, key_prefix):
     st.subheader(title)
 
