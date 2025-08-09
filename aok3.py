@@ -65,6 +65,12 @@ QUICK_VIEWS = {
     }
 }
 
+# Initialize session state for tracking manual changes
+if "manual_filter_change" not in st.session_state:
+    st.session_state.manual_filter_change = False
+if "last_quick_view" not in st.session_state:
+    st.session_state.last_quick_view = ""
+
 # Quick view section with left-aligned layout
 st.markdown("### Quick Views")
 st.markdown("Jump to filters showing the biggest turf changes")
@@ -73,13 +79,24 @@ st.markdown("Jump to filters showing the biggest turf changes")
 col1, col2, col3 = st.columns([2, 3, 3])
 
 with col1:
+    # Reset to blank if manual filter change detected
+    if st.session_state.manual_filter_change:
+        default_index = 0
+        st.session_state.manual_filter_change = False
+        st.session_state.last_quick_view = ""
+    else:
+        default_index = 0
+    
     # Selector - auto-applies on change
     qv = st.selectbox(
         "Select a view:",
         list(QUICK_VIEWS.keys()),
-        index=0,
+        index=default_index,
         key="quick_view_selector"
     )
+    
+    # Track the current quick view
+    st.session_state.last_quick_view = qv
 
 # Show description if a view is selected
 if qv and QUICK_VIEWS[qv]["desc"]:
@@ -95,6 +112,19 @@ if qv:
 else:
     default_regions = []
     default_turfs = []
+
+# Callback functions to detect manual changes
+def on_region_change():
+    if st.session_state.regions_ms != QUICK_VIEWS.get(st.session_state.last_quick_view, {}).get("regions", []):
+        st.session_state.manual_filter_change = True
+
+def on_turf_change():
+    expected_turfs = QUICK_VIEWS.get(st.session_state.last_quick_view, {}).get("turfs", [])
+    # Filter expected turfs to only those available
+    if "available_turfs_list" in st.session_state:
+        expected_turfs = [t for t in expected_turfs if t in st.session_state.available_turfs_list]
+    if st.session_state.turfs_ms != expected_turfs:
+        st.session_state.manual_filter_change = True
 
 # -----------------------------
 # Sidebar: Filters
@@ -112,12 +142,9 @@ with st.sidebar:
         "Select Region(s):", 
         regions_with_all, 
         default=default_regions,
-        key="regions_ms"
+        key="regions_ms",
+        on_change=on_region_change
     )
-    
-    # Check if manual change occurred (selected regions don't match quick view)
-    if selected_regions_raw != default_regions and qv:
-        st.session_state["quick_view_selector"] = ""
 
     if "VA All Regions" in selected_regions_raw:
         selected_regions = regions
@@ -131,6 +158,9 @@ with st.sidebar:
         turfs_all  = sorted(turfs_orig.union(turfs_upd))
     else:
         turfs_all = []
+    
+    # Store available turfs in session state for the callback
+    st.session_state.available_turfs_list = turfs_all
 
     # Turfs widget with default from quick view
     # Only set default turfs if they're in the available turfs
@@ -139,12 +169,9 @@ with st.sidebar:
         "Select Turf(s):", 
         turfs_all, 
         default=available_default_turfs,
-        key="turfs_ms"
+        key="turfs_ms",
+        on_change=on_turf_change
     )
-    
-    # Check if manual change occurred (selected turfs don't match quick view)
-    if selected_turfs != available_default_turfs and qv:
-        st.session_state["quick_view_selector"] = ""
 
     st.markdown("---")
     show_labels = st.checkbox("Show precinct labels on maps", value=False)
